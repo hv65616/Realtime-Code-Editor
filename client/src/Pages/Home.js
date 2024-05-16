@@ -1,13 +1,39 @@
 import React, { useState } from 'react'
 import { v4 as uuidv4 } from "uuid"
+import toast from "react-hot-toast"
+import { useNavigate } from 'react-router-dom'
 const Home = () => {
   const [roomId, setRoomId] = useState("");
-  const [userName,setUserName] = useState("");
-  console.log(roomId,userName)
+  const [userName, setUserName] = useState("");
+  const navigate = useNavigate();
+  // console.log(roomId, userName)
   const createNewRoom = (e) => {
     e.preventDefault()
     const Id = uuidv4()
     setRoomId(Id)
+    toast.success("Created a new room")
+  }
+
+  const joinRoom = () => {
+    if (!roomId) {
+      toast.error("Please enter room id");
+      return;
+    } else if(!userName){
+      toast.error("Please enter username");
+      return;
+    }
+    navigate(`/editor/${roomId}`, {
+      state: {
+        userName
+      }
+    })
+  }
+
+  const handleInputEnter = (e)=>{
+    // console.log(e.code);
+    if(e.code ==="Enter"){
+      joinRoom();
+    }
   }
   return (
     <div className="homePageWrapper">
@@ -25,6 +51,7 @@ const Home = () => {
             placeholder="ROOM ID"
             value={roomId}
             onChange={(e) => { setRoomId(e.target.value) }}
+            onKeyUp={handleInputEnter}
           />
           <input
             type="text"
@@ -32,8 +59,9 @@ const Home = () => {
             placeholder="USERNAME"
             value={userName}
             onChange={(e) => { setUserName(e.target.value) }}
+            onKeyUp={handleInputEnter}
           />
-          <button className="btn joinBtn">
+          <button className="btn joinBtn" onClick={joinRoom}>
             Join
           </button>
           <span className="createInfo">
