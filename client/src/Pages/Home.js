@@ -22,6 +22,7 @@ const Home = () => {
       toast.error("Please enter username");
       return;
     }
+    // console.log(userName)
     navigate(`/editor/${roomId}`, {
       state: {
         userName
