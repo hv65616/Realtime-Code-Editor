@@ -4,7 +4,7 @@ import Editor from "../Components/Editor";
 import { initSocket } from "../socket";
 import ACTIONS from "../Action";
 import { useLocation } from "react-router-dom";
-import toast, { LoaderIcon } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useNavigate, Navigate, useParams } from "react-router-dom";
 const EditorPage = () => {
   const [clients, setClients] = useState([]);
@@ -41,11 +41,23 @@ const EditorPage = () => {
             toast.success(`${username} joined the room`);
             console.log(`${username} joined!!!!`);
           }
-          setClients(clients)
+          setClients(clients);
         }
       );
+      // Listening for disconnected
+      socketRef.current.on(ACTIONS.DISCONNECTED, ({ socketId, username }) => {
+        toast.success(`${username} left the room`);
+        setClients((prev) => {
+          return prev.filter((client) => client.socketId !== socketId);
+        });
+      });
     };
     init();
+    return () => {
+      socketRef.current.disconnect();
+      socketRef.current.off(ACTIONS.JOINED);
+      socketRef.current.off(ACTIONS.DISCONNECTED);
+    };
   }, []);
   if (!location.state) {
     return <Navigate to="/" />;
