@@ -34,6 +34,17 @@ io.on("connection", (socket) => {
       });
     });
   });
+  socket.on("disconnecting", () => {
+    const rooms = [...socket.rooms];
+    rooms.forEach((roomId) => {
+      socket.in(roomId).emit(ACTIONS.DISCONNECTED, {
+        socketId: socket.id,
+        username: userSocketMap[socket.id],
+      });
+    });
+    delete userSocketMap[socket.id];
+    socket.leave();
+  });
 });
 
 server.listen(5000, (req, res) => {
